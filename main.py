@@ -85,17 +85,30 @@ FIM THREADS
 
 
 def exibeTudo():
-    pasta = './jogos'
-    prog.listWidget.clear()
-    for diretorio, subpastas, arquivos in os.walk(pasta):
-        pastas = diretorio.split('\\')
+    inicia, caminhos = verifica_path()
 
-        try:
-            prog.listWidget.addItem(pastas[1])
-        except:
-            prog.label_status.setText('Nenhum jogo encontrado!')
-            prog.frame.setVisible(False)
-            #prog.listWidget.addItem('Não foi possível listar')
+    if caminhos:
+        prog.listWidget.clear()
+        for pasta in caminhos:
+            pasta = pasta.replace('\\', '/')
+            for diretorio, subpastas, arquivos in os.walk(pasta):
+                pastas = diretorio.split('\\')
+                try:
+                    prog.listWidget.addItem(
+                        diretorio.replace('\\', '/').upper())
+                except:
+                    pass
+    else:
+        pasta = './jogos'
+        prog.listWidget.clear()
+        for diretorio, subpastas, arquivos in os.walk(pasta):
+            pastas = diretorio.split('\\')
+            try:
+                prog.listWidget.addItem(pastas[1])
+            except:
+                prog.label_status.setText('Nenhum jogo encontrado!')
+                prog.frame.setVisible(False)
+                # prog.listWidget.addItem('Não foi possível listar')
     prog.label_status.setText(
         'Foi encontrado ' + str(prog.listWidget.count()) + ' jogos')
     if prog.listWidget.count() == 0:
@@ -107,16 +120,32 @@ def exibeTudo():
 
 
 def pesquisa(nome):
-    pasta = './jogos'
-    prog.listWidget.clear()
-    for diretorio, subpastas, arquivos in os.walk(pasta):
-        try:
-            pastas = diretorio.split('\\')
+    inicia, caminhos = verifica_path()
 
-            if str(nome).lower() in str(pastas[1]).lower():
-                prog.listWidget.addItem(str(pastas[1]).upper())
-        except:
-            pass
+    if caminhos:
+        prog.listWidget.clear()
+        for pasta in caminhos:
+            pasta = pasta.replace('\\', '/')
+            for diretorio, subpastas, arquivos in os.walk(pasta):
+                try:
+                    pastas = diretorio.split('\\')
+
+                    if str(nome).lower() in str(pastas[1]).lower():
+                        prog.listWidget.addItem(
+                            str(diretorio).replace('\\', '/').upper())
+                except:
+                    pass
+    else:
+        pasta = './jogos'
+        prog.listWidget.clear()
+        for diretorio, subpastas, arquivos in os.walk(pasta):
+            try:
+                pastas = diretorio.split('\\')
+
+                if str(nome).lower() in str(pastas[1]).lower():
+                    prog.listWidget.addItem(str(pastas[1]).upper())
+            except:
+                pass
     prog.label_status.setText(
         'Foi encontrado ' + str(prog.listWidget.count()) + ' jogos')
     if prog.listWidget.count() == 0:
@@ -132,8 +161,22 @@ def current_drive():
     return os.path.splitdrive(os.getcwd())[0]
 
 
-def abre_pasta(caminho):
-    subprocess.call("explorer " + caminho)
+def abre_pasta():
+    inicia, caminhos = verifica_path()
+    if caminhos:
+        try:
+            caminho = os.path.join(prog.listWidget.currentItem().text())
+            caminho = caminho.replace('/', '\\')
+            print(caminho)
+            subprocess.Popen(f'explorer "{caminho}"')
+        except Exception as e:
+            print(e)
+
+    else:
+        caminho = os.path.join(os.getcwd(), 'Jogos',
+                               prog.listWidget.currentItem().text())
+        print(caminho)
+        subprocess.call("explorer " + caminho)
 
 
 def lista_drivers():
@@ -155,15 +198,73 @@ def copiar_arquivos():
 
 
 def geralista():
-    pasta = './jogos'
-    with open('lista_dos_jogos.txt', 'w+') as f:
-        for diretorio, subpastas, arquivos in os.walk(pasta):
-            pastas = diretorio.split('\\')
+    inicia, caminhos = verifica_path()
 
-            try:
-                f.write(pastas[1]+'\n')
-            except:
-                pass
+    if inicia:
+        if caminhos:
+            with open('lista_dos_jogos.txt', 'w+') as f:
+                for pasta in caminhos:
+                    pasta = pasta.replace('\\', '/')
+                    try:
+                        for diretorio, subpastas, arquivos in os.walk(pasta):
+                            pastas = diretorio.split('\\')
+                            try:
+                                f.write(pastas[1]+'\n')
+                            except:
+                                pass
+                    except Exception as e:
+                        print(e)
+        else:
+            pasta = './jogos'
+            with open('lista_dos_jogos.txt', 'w+') as f:
+                for diretorio, subpastas, arquivos in os.walk(pasta):
+                    pastas = diretorio.split('\\')
+                    try:
+                        f.write(pastas[1]+'\n')
+                    except:
+                        pass
+
+
+def verifica_path():
+    with open('path.txt', 'r') as f:
+        linhas = f.readlines()
+        uso = ''
+        txt = ''
+        caminhos = []
+
+        for linha in linhas:
+            if not '#' in linha:
+                print('leitura: ' + linha)
+                if 'TXT=SIM' in linha:
+                    txt = linha.split('=')[1].strip()
+                if 'HABILITA=SIM' in linha:
+                    uso = linha.split('=')[1].strip()
+                if 'CAMINHO1=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO2=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO3=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO4=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO5=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO6=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO7=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO8=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO9=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+                if 'CAMINHO10=' in linha:
+                    caminhos.append(linha.split('=')[1].strip())
+            # else:
+            #     print('leitura #: ' + linha)
+        if uso == 'SIM':
+            return txt, caminhos
+        else:
+            return txt, False
 
 
 prog.frame.setVisible(False)
@@ -173,8 +274,7 @@ geralista()
 prog.lineEdit.setFocus()
 prog.pushButton.clicked.connect(lambda: exibeTudo())
 prog.pushButton_2.clicked.connect(lambda: pesquisa(prog.lineEdit.text()))
-prog.listWidget.itemDoubleClicked.connect(lambda: abre_pasta(
-    os.path.join(os.getcwd(), 'Jogos', prog.listWidget.currentItem().text())))
+prog.listWidget.itemDoubleClicked.connect(lambda: abre_pasta())
 prog.bt_copiar.clicked.connect(lambda: copiar_arquivos())
 prog.show()
 app.exec()

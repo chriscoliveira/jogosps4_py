@@ -1,0 +1,15 @@
+# para gerar o arquivo txt com os jogos retire o # da linha TXT e mantenha o valor SIM
+# para utilizar caminhos especifícos para os jogos retire o # da linha HABILITA use o valor SIM
+# para utilizar o caminho de cada pasta retire o # da linha CAMINHO(X) use o endereco da pasta Ex: C:/Users/usuario/Desktop/pasta de jogos
+#TXT=SIM
+HABILITA=SIM
+CAMINHO1=P:/jogos
+#CAMINHO2=
+#CAMINHO3=
+#CAMINHO4=
+#CAMINHO5=
+#CAMINHO6=
+#CAMINHO7=
+#CAMINHO8=
+#CAMINHO9=
+#CAMINHO10=
